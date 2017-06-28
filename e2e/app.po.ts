@@ -1,6 +1,6 @@
 import { browser, by, element } from 'protractor';
 
-export class Angular2ReduxPage {
+export class Angular4ReduxPage {
   navigateTo() {
     return browser.get('/');
   }

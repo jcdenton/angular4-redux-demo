@@ -1,10 +1,10 @@
-import { Angular2ReduxPage } from './app.po';
+import { Angular4ReduxPage } from './app.po';
 
-describe('angular2-redux App', () => {
-  let page: Angular2ReduxPage;
+describe('angular4-redux App', () => {
+  let page: Angular4ReduxPage;
 
   beforeEach(() => {
-    page = new Angular2ReduxPage();
+    page = new Angular4ReduxPage();
   });
 
   it('should display welcome message', () => {

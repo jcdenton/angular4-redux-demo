@@ -1,16 +1,46 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import {
+  MdButtonModule,
+  MdCardModule,
+  MdChipsModule,
+  MdInputModule,
+  MdListModule,
+  MdSelectModule
+} from '@angular/material';
 
 import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app.routing.module';
+import { CourseComponent, CourseListComponent, CourseListItemComponent, CourseService } from './courses';
 
 @NgModule({
+  entryComponents: [
+    CourseComponent
+  ],
   declarations: [
-    AppComponent
+    AppComponent,
+    CourseListComponent,
+    CourseListItemComponent,
+    CourseComponent,
   ],
   imports: [
-    BrowserModule
+    AppRoutingModule,
+    BrowserModule,
+    BrowserAnimationsModule,
+    FormsModule,
+    MdCardModule,
+    MdListModule,
+    MdInputModule,
+    MdChipsModule,
+    MdButtonModule,
+    MdSelectModule,
   ],
-  providers: [],
+  providers: [
+    CourseService,
+  ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
