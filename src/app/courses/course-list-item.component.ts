@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Course } from './course';
 import { MdListItem } from '@angular/material';
+
+import { Course } from './course';
 
 @Component({
   selector: 'course-list-item',

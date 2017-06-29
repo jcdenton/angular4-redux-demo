@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Course } from './course';
+import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/defer';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/distinct';
 import * as _ from 'lodash';
+
+import { Course } from './course';
 
 const allCourses = [
   {
@@ -28,7 +30,7 @@ const allCourses = [
 @Injectable()
 export class CourseService {
 
-  constructor() { }
+  constructor(private http: Http) { }
 
 
   getCourses(): Observable<Course[]> {
