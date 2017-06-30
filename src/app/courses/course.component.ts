@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Course } from './course';
 import { CourseService } from './course.service';
+import { store } from '../app.store';
+import { clearCourseSelection } from './course.actions';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'course-form',
@@ -55,42 +58,48 @@ import { CourseService } from './course.service';
       </div>
 
       <div class="course-form__buttons-container">
-        <button md-raised-button color="accent" (click)="save()">Save</button>
-        <button md-button routerLink="/courses" type="reset">Cancel</button>
-        <button *ngIf="course.id" md-button type="reset" (click)="remove()" class="course-form__button-remove">Remove
+        <button md-raised-button color="accent" routerLink="/courses" (click)="save()">Save</button>
+        <button md-button routerLink="/courses" routerLink="/courses" type="reset">Cancel</button>
+        <button *ngIf="course.id" md-button type="reset" routerLink="/courses" (click)="remove()"
+                class="course-form__button-remove">Remove
         </button>
       </div>
     </form>
   `,
 })
-export class CourseComponent implements OnInit {
+export class CourseComponent implements OnInit, OnDestroy {
+  private unsubscribeFromStore;
   protected course: Course;
   protected allTopics: string[];
 
-  constructor(private route: ActivatedRoute, private router: Router, private courseService: CourseService) {
-  }
+  constructor(private courseService: CourseService) { }
 
   ngOnInit() {
-    const courseId = +this.route.snapshot.params['id'];
-    if (courseId) {
-      this.courseService.getCourse(courseId).subscribe(course => this.course = course);
-    } else {
-      this.course = {
-        name: '',
-        topics: []
-      }
-    }
+    this.unsubscribeFromStore = store.subscribe(() => this.updateFromState.bind(this));
+    this.updateFromState();
+  }
 
-    this.courseService.getAllTopics().subscribe(topics => this.allTopics = topics);
+  ngOnDestroy(): void {
+    store.dispatch(clearCourseSelection());
+    this.unsubscribeFromStore();
+  }
+
+  updateFromState() {
+    this.course = Object.assign({}, store.getState().selectedCourse);
+    this.allTopics = this.getAllTopics();
   }
 
   save() {
     this.courseService.saveCourse(this.course);
-    this.router.navigateByUrl('/courses');
   }
 
   remove() {
     this.courseService.removeCourse(this.course);
-    this.router.navigateByUrl('/courses');
+  }
+
+  private getAllTopics() {
+    const courses = store.getState().courses;
+    const topics = _.flatMap(courses, course => course.topics);
+    return _.uniq(topics).sort();
   }
 }

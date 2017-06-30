@@ -1,26 +1,30 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Course } from './course';
-import { filterCourses } from './course.actions';
+import { createNewCourse, filterCourses } from './course.actions';
 import { CourseService } from './course.service';
 import { store } from '../app.store';
 
 @Component({
   selector: 'course-list',
   styles: [`
-    button[md-fab].add-course {
+    .filter-container {
+      width: 50%;
+    }
+
+    .float-right {
       float: right;
     }
 
-    button[md-fab].add-course md-icon {
+    button[md-fab] md-icon {
       vertical-align: middle;
     }
   `],
   template: `
-    <md-input-container>
+    <md-input-container class="filter-container">
       <input mdInput placeholder="Filter courses" (input)="updateCoursesFilter($event)" [value]="coursesFilter">
     </md-input-container>
-    <button md-fab class="add-course" routerLink="/courses/new">
+    <button md-fab class="float-right" (click)="addCourse()" routerLink="/courses/new">
       <md-icon class="material-icons">add</md-icon>
     </button>
     <md-nav-list class="course-list">
@@ -33,9 +37,15 @@ export class CourseListComponent implements OnInit, OnDestroy {
   filteredCourses: Course[];
   coursesFilter: string;
 
-  constructor(private courseService: CourseService) {
+  constructor(private courseService: CourseService) { }
+
+  ngOnInit() {
     this.unsubscribeFromStore = store.subscribe(this.updateFromState.bind(this));
     this.updateFromState();
+  }
+
+  ngOnDestroy() {
+    this.unsubscribeFromStore();
   }
 
   updateFromState() {
@@ -55,11 +65,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
     store.dispatch(filterCourses(filterText));
   }
 
-  ngOnInit() {
-    // this.courseService.loadCourses();
-  }
-
-  ngOnDestroy() {
-    this.unsubscribeFromStore();
+  addCourse() {
+    store.dispatch(createNewCourse());
   }
 }

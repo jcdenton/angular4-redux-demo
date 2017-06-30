@@ -2,6 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MdListItem } from '@angular/material';
 
 import { Course } from './course';
+import { store } from '../app.store';
+import { selectCourse } from './course.actions';
 
 @Component({
   selector: 'course-list-item',
@@ -16,7 +18,7 @@ import { Course } from './course';
   `],
   template: `
     <md-divider></md-divider>
-    <md-list-item routerLink="/courses/{{course.id}}">
+    <md-list-item routerLink="/courses/{{course.id}}" (click)="viewCourse()">
       <md-icon md-list-icon class="material-icons">library_books</md-icon>
       <h3 md-line> {{ course.name }} </h3>
       <md-chip-list md-line class="course-list-item__topics-chips" *ngIf="!!course.topics">
@@ -25,9 +27,10 @@ import { Course } from './course';
     </md-list-item>
   `,
 })
-export class CourseListItemComponent extends MdListItem implements OnInit {
+export class CourseListItemComponent extends MdListItem {
   @Input() course: Course;
 
-  ngOnInit() {
+  viewCourse() {
+    store.dispatch(selectCourse(this.course));
   }
 }
