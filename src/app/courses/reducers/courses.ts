@@ -1,22 +1,22 @@
 import { reduce } from './common';
 
 import { Course } from '../course';
-
-function findCourseIndexById(courses: Course[], courseId: number) {
-  return courses.findIndex(course => course.id === courseId);
-}
+import { COURSE_CREATE, COURSE_REMOVE, COURSE_UPDATE, COURSES_ADD } from '../course.actions';
 
 const coursesReducers = {
-  COURSES_ADD: function (state: Course[], courses) {
+  [COURSES_ADD]: function (state: Course[], courses) {
     return [...state, ...courses];
   },
 
-  COURSES_UPDATE: function (state: Course[], course) {
-    const courseIndex = findCourseIndexById(state, course.id);
-    return state.slice().splice(courseIndex, 1, course);
+  [COURSE_CREATE]: function (state: Course[], course) {
+    return [...state, course];
   },
 
-  COURSES_REMOVE: function (state: Course[], courseId) {
+  [COURSE_UPDATE]: function (state: Course[], updatedCourse) {
+    return state.map(course => course.id === updatedCourse.id ? updatedCourse : course);
+  },
+
+  [COURSE_REMOVE]: function (state: Course[], courseId) {
     return state.filter(course => course.id !== courseId);
   }
 };
