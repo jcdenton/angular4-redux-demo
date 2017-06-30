@@ -85,10 +85,12 @@ export class CourseComponent implements OnInit {
   }
 
   save() {
-    this.courseService.saveCourse(this.course).subscribe(() => this.router.navigateByUrl('/courses'));
+    this.courseService.saveCourse(this.course);
+    this.router.navigateByUrl('/courses');
   }
 
   remove() {
-    this.courseService.removeCourse(this.course).subscribe(() => this.router.navigateByUrl('/courses'));
+    this.courseService.removeCourse(this.course);
+    this.router.navigateByUrl('/courses');
   }
 }

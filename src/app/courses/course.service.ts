@@ -8,69 +8,42 @@ import 'rxjs/add/operator/distinct';
 import * as _ from 'lodash';
 
 import { Course } from './course';
-
-const allCourses = [
-  {
-    'id': 1,
-    'name': 'Building Apps with React',
-    'topics': ['ReactJS']
-  },
-  {
-    'id': 2,
-    'name': 'Building Apps with Angular',
-    'topics': ['AngularJS']
-  },
-  {
-    'id': 3,
-    'name': 'Building Apps with Angular and Redux',
-    'topics': ['AngularJS', 'Redux']
-  }
-];
+import { addCourses, removeCourse, updateCourse } from './course.actions';
+import { store } from '../app.store';
 
 @Injectable()
 export class CourseService {
 
   constructor(private http: Http) { }
 
+  private getCourses() {
+    return this.http.get('assets/courses.json').map(response => response.json());
+  }
 
-  getCourses(): Observable<Course[]> {
-    return Observable.of(allCourses);
+  loadCourses(): void {
+    this.getCourses().map(addCourses).subscribe(store.dispatch.bind(store));
   }
 
   getCourse(courseId: number): Observable<Course> {
-    return this.getCourses().map(courses => this.findCourseById(courses, courseId));
+    return Observable.of(this.findCourseById(store.getState().courses, courseId));
   }
 
   getAllTopics(): Observable<string[]> {
-    return this.getCourses()
-      .map(courses => {
-        const topics = _.flatMap(courses.map(course => course.topics));
-        return _.uniq(topics).sort();
-      });
+    const courses = store.getState().courses;
+    const topics = _.flatMap(courses.map(course => course.topics));
+    return Observable.of(_.uniq(topics).sort());
   }
 
-  saveCourse(course: Course): Observable<Course[]> {
+  saveCourse(course: Course): void {
     if (course.id) {
-      this.updateCourse(course);
+      store.dispatch(updateCourse(course));
     } else {
-      this.insertCourse(course);
+      store.dispatch(addCourses([course]));
     }
-    return this.getCourses();
   }
 
-  removeCourse(course: Course): Observable<Course[]> {
-    const courseIndex = allCourses.findIndex(c => c.id === course.id);
-    allCourses.splice(courseIndex, 1);
-    return this.getCourses();
-  }
-
-  private updateCourse(course: Course) {
-    Object.assign(this.findCourseById(allCourses, course.id), course);
-  }
-
-  private insertCourse(course: Course) {
-    const newCourse = Object.assign({ 'id': allCourses.length + 1 }, course);
-    allCourses.push(newCourse);
+  removeCourse(course: Course): void {
+    store.dispatch(removeCourse(course.id));
   }
 
   private findCourseById(courses: Course[], courseId: number) {
