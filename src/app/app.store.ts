@@ -3,7 +3,7 @@ import { combineReducers, createStore, Reducer, Store } from 'redux';
 import * as _ from 'lodash';
 
 import { Course } from './courses/course';
-import { courses, coursesFilter, selectedCourse } from './courses/reducers';
+import { courses, coursesFilter, selectedCourse } from './courses';
 
 export interface AppState {
   courses: Course[];
