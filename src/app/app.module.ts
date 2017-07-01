@@ -1,18 +1,24 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { MdCardModule } from '@angular/material';
 
 import { AppComponent } from './app.component';
+import { NotFoundComponent } from './not-found-component';
 import { CourseModule } from './courses/course.module';
+
+const routes: Routes = [
+  { path: '**', component: NotFoundComponent },
+];
 
 @NgModule({
   declarations: [
     AppComponent,
+    NotFoundComponent,
   ],
   imports: [
-    RouterModule.forRoot([]),
+    RouterModule.forRoot(routes),
     BrowserModule,
     BrowserAnimationsModule,
     MdCardModule,
