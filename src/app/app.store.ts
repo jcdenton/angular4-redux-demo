@@ -1,19 +1,15 @@
-import { isDevMode } from '@angular/core';
-import { combineReducers, createStore, Reducer, Store } from 'redux';
-import * as _ from 'lodash';
+import { combineReducers, Reducer } from 'redux';
+import { composeReducers, defaultFormReducer } from '@angular-redux/form/dist/source';
 
 import { Course } from './courses/course';
 import { courses, coursesFilter, selectedCourse } from './courses';
 
 export interface AppState {
-  courses: Course[];
-  coursesFilter: string;
-  selectedCourse: Course;
+  courses?: Course[];
+  coursesFilter?: string;
+  selectedCourse?: Course;
 }
 
-const appReducer: Reducer<AppState> = combineReducers<AppState>({ courses, coursesFilter, selectedCourse });
+const coursesReducer = combineReducers<AppState>({ courses, coursesFilter, selectedCourse });
 
-declare const window: any;
-const devToolsExtension = isDevMode() && window.devToolsExtension ? window.devToolsExtension() : _.identity;
-
-export const store: Store<AppState> = createStore(appReducer, devToolsExtension);
+export const rootReducer: Reducer<AppState> = composeReducers(defaultFormReducer(), coursesReducer);

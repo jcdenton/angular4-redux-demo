@@ -1,15 +1,19 @@
 import { reduce } from './common';
-
 import { Course } from '../course';
-import { COURSE_CREATE, COURSE_REMOVE, COURSE_UPDATE, COURSES_ADD } from '../course.actions';
+import { COURSE_CREATE, COURSE_REMOVE, COURSE_UPDATE, COURSES_ADD, COURSES_FETCH } from '../course.actions';
 
 const coursesReducers = {
   [COURSES_ADD]: function (state: Course[], courses) {
     return [...state, ...courses];
   },
 
+  [COURSES_FETCH]: function (state: Course[], courses) {
+    return [...courses];
+  },
+
   [COURSE_CREATE]: function (state: Course[], course) {
-    return [...state, course];
+    const newCourse = Object.assign({}, course, { id: state.length + 1 });
+    return [...state, newCourse];
   },
 
   [COURSE_UPDATE]: function (state: Course[], updatedCourse) {

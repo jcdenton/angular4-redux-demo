@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { CourseService } from './courses';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +18,4 @@ import { CourseService } from './courses';
   `,
 })
 export class AppComponent {
-  constructor(private courseService: CourseService) {
-    this.courseService.loadCourses();
-  }
 }

@@ -4,7 +4,7 @@ import { COURSE_CLEAR_SELECTION, COURSE_CREATE, COURSE_SELECT, COURSE_SELECT_NEW
 
 const initialState: Course = {
   name: '',
-  topics: []
+  topics: [] as string[]
 };
 
 function getInitialState() {
@@ -16,9 +16,9 @@ const selectedCourseReducers = {
     return Object.assign({}, course);
   },
 
-  [COURSE_SELECT_NEW]: getInitialState,
+  [COURSE_CLEAR_SELECTION]: (state) => null,
 
-  [COURSE_CLEAR_SELECTION]: getInitialState,
+  [COURSE_SELECT_NEW]: getInitialState,
 
   [COURSE_CREATE]: getInitialState,
 };

@@ -1,9 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { NgRedux } from '@angular-redux/store';
+import { Observable } from 'rxjs/Observable';
 
 import { Course } from './course';
-import { createNewCourse, filterCourses } from './course.actions';
-import { CourseService } from './course.service';
-import { store } from '../app.store';
+import { CourseActions } from './course.actions';
+import { AppState } from '../app.store';
 
 @Component({
   selector: 'course-list',
@@ -16,56 +17,53 @@ import { store } from '../app.store';
       float: right;
     }
 
+    .no-courses {
+      margin-top: 1em;
+      text-align: center;
+    }
+
     button[md-fab] md-icon {
       vertical-align: middle;
     }
   `],
   template: `
     <md-input-container class="filter-container">
-      <input mdInput placeholder="Filter courses" (input)="updateCoursesFilter($event)" [value]="coursesFilter">
+      <input mdInput placeholder="Filter courses" (input)="updateCoursesFilter($event)">
     </md-input-container>
-    <button md-fab class="float-right" (click)="addCourse()" routerLink="/courses/new">
+    <button md-fab class="float-right" (click)="createNewCourse()" routerLink="/courses/new">
       <md-icon class="material-icons">add</md-icon>
     </button>
     <md-nav-list class="course-list">
-      <course-list-item *ngFor="let course of filteredCourses" [course]="course"></course-list-item>
+      <course-list-item *ngFor="let course of (filteredCourses$ | async)" [course]="course"></course-list-item>
+      <div *ngIf="(filteredCourses$ | async).length === 0" class="no-courses">
+        <md-divider></md-divider>
+        <h3>No courses to display</h3>
+      </div>
     </md-nav-list>
   `,
 })
-export class CourseListComponent implements OnInit, OnDestroy {
-  private unsubscribeFromStore;
-  filteredCourses: Course[];
-  coursesFilter: string;
+export class CourseListComponent {
+  private filteredCourses$: Observable<Course[]>;
 
-  constructor(private courseService: CourseService) { }
-
-  ngOnInit() {
-    this.unsubscribeFromStore = store.subscribe(this.updateFromState.bind(this));
-    this.updateFromState();
+  constructor(private courseActions: CourseActions, private ngRedux: NgRedux<AppState>) {
+    this.filteredCourses$ = ngRedux.select(this.filteredCoursesSelector);
   }
 
-  ngOnDestroy() {
-    this.unsubscribeFromStore();
+  private updateCoursesFilter(event: KeyboardEvent) {
+    const filterText = (<HTMLInputElement>event.target).value;
+    this.courseActions.filterCourses(filterText);
   }
 
-  updateFromState() {
-    const allCourses = store.getState().courses;
+  private filteredCoursesSelector(state) {
+    return state.courses.filter(course => {
+      const filterText = state.coursesFilter.toLowerCase();
 
-    this.coursesFilter = store.getState().coursesFilter;
-    const filterText = this.coursesFilter.toLowerCase();
-
-    this.filteredCourses = allCourses.filter(course => {
       return course.name.toLowerCase().indexOf(filterText) > -1
         || course.topics.findIndex(topic => topic.toLowerCase().indexOf(filterText) > -1) > -1;
-    });
+    })
   }
 
-  updateCoursesFilter(event: KeyboardEvent) {
-    const filterText = (<HTMLInputElement>event.target).value;
-    store.dispatch(filterCourses(filterText));
-  }
-
-  addCourse() {
-    store.dispatch(createNewCourse());
+  private createNewCourse() {
+    this.courseActions.createNewCourse();
   }
 }

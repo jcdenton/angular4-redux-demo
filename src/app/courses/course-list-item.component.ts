@@ -1,9 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { MdListItem } from '@angular/material';
+import { Component, ElementRef, Input, Renderer2 } from '@angular/core';
+import { MdList, MdListItem, MdNavListCssMatStyler } from '@angular/material';
 
 import { Course } from './course';
-import { store } from '../app.store';
-import { selectCourse } from './course.actions';
+import { CourseActions } from './course.actions';
 
 @Component({
   selector: 'course-list-item',
@@ -18,7 +17,7 @@ import { selectCourse } from './course.actions';
   `],
   template: `
     <md-divider></md-divider>
-    <md-list-item routerLink="/courses/{{course.id}}" (click)="viewCourse()">
+    <md-list-item routerLink="/courses/{{course.id}}" (click)="selectCourse()">
       <md-icon md-list-icon class="material-icons">library_books</md-icon>
       <h3 md-line> {{ course.name }} </h3>
       <md-chip-list md-line class="course-list-item__topics-chips" *ngIf="!!course.topics">
@@ -27,10 +26,12 @@ import { selectCourse } from './course.actions';
     </md-list-item>
   `,
 })
-export class CourseListItemComponent extends MdListItem {
-  @Input() course: Course;
+export class CourseListItemComponent {
+  @Input() private course: Course;
 
-  viewCourse() {
-    store.dispatch(selectCourse(this.course));
+  constructor(private courseActions: CourseActions) { }
+
+  private selectCourse() {
+    this.courseActions.selectCourse(this.course);
   }
 }

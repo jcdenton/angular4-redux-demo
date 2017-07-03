@@ -2,32 +2,26 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 
 import { Course } from './course';
-import { addCourses, createCourse, removeCourse, updateCourse } from './course.actions';
-import { store } from '../app.store';
+import { CourseActions } from './course.actions';
 
 @Injectable()
 export class CourseService {
 
-  constructor(private http: Http) { }
+  constructor(private http: Http, private courseActions: CourseActions) { }
 
   private getCourses() {
     return this.http.get('assets/courses.json').map(response => response.json());
   }
 
-  loadCourses(): void {
-    this.getCourses().map(addCourses).subscribe(store.dispatch.bind(store));
+  fetchCourses(): void {
+    this.getCourses().subscribe(courses => this.courseActions.coursesFetch(courses));
   }
 
   saveCourse(course: Course): void {
     if (course.id) {
-      store.dispatch(updateCourse(course));
+      this.courseActions.updateCourse(course);
     } else {
-      const newCourse = Object.assign({ id: store.getState().courses.length + 1 }, course);
-      store.dispatch(createCourse(newCourse));
+      this.courseActions.createCourse(course);
     }
-  }
-
-  removeCourse(course: Course): void {
-    store.dispatch(removeCourse(course.id));
   }
 }

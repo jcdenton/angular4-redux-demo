@@ -1,19 +1,21 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { NgRedux, select, select$ } from '@angular-redux/store';
+import { Observable } from 'rxjs/Observable';
+import * as _ from 'lodash';
 
 import { Course } from './course';
 import { CourseService } from './course.service';
-import { store } from '../app.store';
-import { clearCourseSelection } from './course.actions';
-import * as _ from 'lodash';
+import { CourseActions } from './course.actions';
+import { AppState } from '../app.store';
 
 @Component({
   selector: 'course-form',
   styles: [`
-    .course-form__form {
+    .course-form {
       width: 100%;
     }
 
-    .course-form__md-input-container {
+    md-input-container {
       width: 100%;
     }
 
@@ -28,77 +30,66 @@ import * as _ from 'lodash';
       margin-bottom: 1em;
     }
 
-    .course-form__buttons-container {
+    .buttons-container {
       margin-top: 1em;
     }
 
-    .course-form__button-remove {
+    .button-remove {
       float: right;
     }
   `],
   template: `
-    <form class="course-form__form">
-      <div *ngIf="course.id">
+    <form class="course-form" connect="selectedCourse">
+      <div *ngIf="(selectedCourse$ | async).id">
         <md-input-container class="course-form__md-input-container">
-          <input mdInput placeholder="ID" name="id" disabled value="{{course.id}}">
+          <input mdInput name="id" ngModel placeholder="ID" readonly disabled>
         </md-input-container>
       </div>
 
       <div>
         <md-input-container class="course-form__md-input-container">
-          <input mdInput placeholder="Name" name="name" required [(ngModel)]="course.name">
+          <input mdInput name="name" ngModel placeholder="Name" required>
         </md-input-container>
       </div>
 
       <div class="course-form__topic-md-select-container">
-        <md-select name="topics" [multiple]="true" [(ngModel)]="course.topics" placeholder="Topics">
-          <md-option *ngFor="let topic of allTopics" [value]="topic">{{topic}}</md-option>
+        <md-select name="topics" ngModel placeholder="Topics" [multiple]="true">
+          <md-option *ngFor="let topic of (allTopics$ | async)" [value]="topic">{{topic}}</md-option>
         </md-select>
       </div>
 
-      <div class="course-form__buttons-container">
+      <div class="buttons-container">
         <button md-raised-button color="accent" routerLink="/courses" (click)="save()">Save</button>
-        <button md-button routerLink="/courses" routerLink="/courses" type="reset">Cancel</button>
-        <button *ngIf="course.id" md-button type="reset" routerLink="/courses" (click)="remove()"
-                class="course-form__button-remove">Remove
+        <button md-button routerLink="/courses" type="reset">Cancel</button>
+        <button md-button routerLink="/courses" type="reset" (click)="remove()" class="button-remove"
+                *ngIf="(selectedCourse$ | async).id">Remove
         </button>
       </div>
     </form>
   `,
 })
-export class CourseComponent implements OnInit, OnDestroy {
-  private unsubscribeFromStore;
-  protected course: Course;
-  protected allTopics: string[];
+export class CourseComponent implements OnDestroy {
+  @select('selectedCourse') protected selectedCourse$: Observable<Course>;
+  @select$('courses', allTopicsTransformer) protected allTopics$: Observable<string[]>;
 
-  constructor(private courseService: CourseService) { }
-
-  ngOnInit() {
-    this.unsubscribeFromStore = store.subscribe(() => this.updateFromState.bind(this));
-    this.updateFromState();
-  }
+  constructor(private courseService: CourseService, private ngRedux: NgRedux<AppState>, private courseActions: CourseActions) { }
 
   ngOnDestroy(): void {
-    store.dispatch(clearCourseSelection());
-    this.unsubscribeFromStore();
-  }
-
-  updateFromState() {
-    this.course = Object.assign({}, store.getState().selectedCourse);
-    this.allTopics = this.getAllTopics();
+    this.courseActions.clearCourseSelection();
   }
 
   save() {
-    this.courseService.saveCourse(this.course);
+    this.courseService.saveCourse(this.ngRedux.getState().selectedCourse);
   }
 
   remove() {
-    this.courseService.removeCourse(this.course);
+    this.courseActions.removeCourse(this.ngRedux.getState().selectedCourse.id);
   }
+}
 
-  private getAllTopics() {
-    const courses = store.getState().courses;
+function allTopicsTransformer(courses$: Observable<Course[]>): Observable<string[]> {
+  return courses$.map(courses => {
     const topics = _.flatMap(courses, course => course.topics);
     return _.uniq(topics).sort();
-  }
+  });
 }
