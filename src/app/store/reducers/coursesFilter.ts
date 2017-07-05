@@ -1,5 +1,7 @@
 import { reduce } from './common';
-import { COURSES_FILTER } from '../course.actions';
+import { COURSES_FILTER } from '../../courses';
+
+export const coursesFilterInitialState = '';
 
 const coursesFilterReducers = {
   [COURSES_FILTER]: function (state, filterText) {
@@ -7,6 +9,6 @@ const coursesFilterReducers = {
   }
 };
 
-export function coursesFilter(state = '', { type, payload }) {
+export function coursesFilter(state = coursesFilterInitialState, { type, payload }) {
   return reduce(coursesFilterReducers, state, type, payload);
 }

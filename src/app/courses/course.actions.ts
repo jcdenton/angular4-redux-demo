@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { AppState } from '../app.store';
 import { NgRedux } from '@angular-redux/store';
 import { Course } from './course';
+import { AppState } from '../store';
 
 export const COURSES_ADD = 'COURSES_ADD';
 export const COURSES_FILTER = 'COURSES_FILTER';
@@ -29,11 +29,11 @@ export class CourseActions {
     return this.ngRedux.dispatch({ type: COURSES_FILTER, payload: filterText });
   }
 
-  selectCourse(course: Course) {
-    return this.ngRedux.dispatch({ type: COURSE_SELECT, payload: course });
+  selectCourse(courseId: number) {
+    return this.ngRedux.dispatch({ type: COURSE_SELECT, payload: courseId });
   }
 
-  createNewCourse() {
+  selectNewCourse() {
     return this.ngRedux.dispatch({ type: COURSE_SELECT_NEW });
   }
 

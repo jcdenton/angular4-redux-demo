@@ -1,12 +1,11 @@
-import { Component, OnDestroy } from '@angular/core';
-import { NgRedux, select, select$ } from '@angular-redux/store';
+import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { select, select$ } from '@angular-redux/store';
 import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
 
 import { Course } from './course';
 import { CourseService } from './course.service';
-import { CourseActions } from './course.actions';
-import { AppState } from '../app.store';
 
 @Component({
   selector: 'course-form',
@@ -68,26 +67,33 @@ import { AppState } from '../app.store';
     </form>
   `,
 })
-export class CourseComponent implements OnDestroy {
+export class CourseComponent {
   @select('selectedCourse') protected selectedCourse$: Observable<Course>;
   @select$('courses', allTopicsTransformer) protected allTopics$: Observable<string[]>;
 
-  constructor(private courseService: CourseService, private ngRedux: NgRedux<AppState>, private courseActions: CourseActions) { }
-
-  ngOnDestroy(): void {
-    this.courseActions.clearCourseSelection();
+  constructor(private courseService: CourseService, private route: ActivatedRoute) {
+    this.route.paramMap.subscribe(paramsMap => {
+      const id = paramsMap.get('id');
+      this.courseService.selectCourse(id);
+    });
   }
 
   save() {
-    this.courseService.saveCourse(this.ngRedux.getState().selectedCourse);
+    this.selectedCourse$.subscribe(course => {
+      this.courseService.saveCourse(course);
+      this.courseService.unselectCourse();
+    });
   }
 
   remove() {
-    this.courseActions.removeCourse(this.ngRedux.getState().selectedCourse.id);
+    this.selectedCourse$.subscribe(course => {
+      this.courseService.removeCourse(course);
+      this.courseService.unselectCourse();
+    });
   }
 }
 
-function allTopicsTransformer(courses$: Observable<Course[]>): Observable<string[]> {
+export function allTopicsTransformer(courses$: Observable<Course[]>): Observable<string[]> {
   return courses$.map(courses => {
     const topics = _.flatMap(courses, course => course.topics);
     return _.uniq(topics).sort();

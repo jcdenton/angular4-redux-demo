@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { Course } from './course';
 import { CourseActions } from './course.actions';
-import { AppState } from '../app.store';
+import { AppState } from '../store';
 
 @Component({
   selector: 'course-list',
@@ -30,7 +30,7 @@ import { AppState } from '../app.store';
     <md-input-container class="filter-container">
       <input mdInput placeholder="Filter courses" (input)="updateCoursesFilter($event)">
     </md-input-container>
-    <button md-fab class="float-right" (click)="createNewCourse()" routerLink="/courses/new">
+    <button md-fab class="float-right" routerLink="/courses/new">
       <md-icon class="material-icons">add</md-icon>
     </button>
     <md-nav-list class="course-list">
@@ -43,7 +43,7 @@ import { AppState } from '../app.store';
   `,
 })
 export class CourseListComponent {
-  private filteredCourses$: Observable<Course[]>;
+  protected filteredCourses$: Observable<Course[]>;
 
   constructor(private courseActions: CourseActions, private ngRedux: NgRedux<AppState>) {
     this.filteredCourses$ = ngRedux.select(this.filteredCoursesSelector);
@@ -61,9 +61,5 @@ export class CourseListComponent {
       return course.name.toLowerCase().indexOf(filterText) > -1
         || course.topics.findIndex(topic => topic.toLowerCase().indexOf(filterText) > -1) > -1;
     })
-  }
-
-  private createNewCourse() {
-    this.courseActions.createNewCourse();
   }
 }

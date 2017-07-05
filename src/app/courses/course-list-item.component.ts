@@ -1,5 +1,4 @@
-import { Component, ElementRef, Input, Renderer2 } from '@angular/core';
-import { MdList, MdListItem, MdNavListCssMatStyler } from '@angular/material';
+import { Component, Input } from '@angular/core';
 
 import { Course } from './course';
 import { CourseActions } from './course.actions';
@@ -27,11 +26,11 @@ import { CourseActions } from './course.actions';
   `,
 })
 export class CourseListItemComponent {
-  @Input() private course: Course;
+  @Input() protected course: Course;
 
   constructor(private courseActions: CourseActions) { }
 
   private selectCourse() {
-    this.courseActions.selectCourse(this.course);
+    // this.courseActions.selectCourse(this.course.id);
   }
 }

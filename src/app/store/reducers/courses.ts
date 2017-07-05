@@ -1,6 +1,7 @@
 import { reduce } from './common';
-import { Course } from '../course';
-import { COURSE_CREATE, COURSE_REMOVE, COURSE_UPDATE, COURSES_ADD, COURSES_FETCH } from '../course.actions';
+import { Course, COURSE_CREATE, COURSE_REMOVE, COURSE_UPDATE, COURSES_ADD, COURSES_FETCH } from '../../courses';
+
+export const coursesInitialState = [];
 
 const coursesReducers = {
   [COURSES_ADD]: function (state: Course[], courses) {
@@ -25,6 +26,6 @@ const coursesReducers = {
   }
 };
 
-export function courses(state = [], { type, payload }) {
+export function courses(state = coursesInitialState, { type, payload }) {
   return reduce(coursesReducers, state, type, payload);
 }
