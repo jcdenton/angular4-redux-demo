@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule, Routes } from '@angular/router';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { MdCardModule } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -23,6 +24,9 @@ const routes: Routes = [
     BrowserAnimationsModule,
     MdCardModule,
     CourseModule,
+  ],
+  providers: [
+    { provide: LocationStrategy, useClass: HashLocationStrategy },
   ],
   bootstrap: [AppComponent]
 })
