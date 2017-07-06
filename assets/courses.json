@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "name": "Building Apps with React",
+    "topics": [
+      "ReactJS"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Building Apps with Angular",
+    "topics": [
+      "AngularJS"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Building Apps with Angular and Redux",
+    "topics": [
+      "AngularJS",
+      "Redux"
+    ]
+  }
+]
